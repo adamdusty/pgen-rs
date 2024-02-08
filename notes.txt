@@ -1,0 +1,9 @@
+lib
+read template from json
+read variable defs from json
+render text
+
+bin
+pgen gen
+    --template
+    --defs

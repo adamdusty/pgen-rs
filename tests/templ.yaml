@@ -1,0 +1,22 @@
+variables:
+  - "namespace"
+  - "project_name"
+
+directories:
+  - "include/{ namespace }"
+  - "src"
+  - "docs"
+  - "examples"
+  - "tests/src"
+  - "benchmarks"
+
+files:
+  - path: "include/{ namespace }/{ project_name }.hpp"
+    content: |
+      #pragma once
+
+      namespace { namespace } \{
+
+      constexpr auto version() -> int \{ return 0; \}
+      
+      \}

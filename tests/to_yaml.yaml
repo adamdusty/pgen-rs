@@ -1,0 +1,23 @@
+variables:
+- project_name
+- namespace
+directories:
+- include
+- include\{@ project_name @}
+- src
+files:
+- path: include\{@ project_name @}\{project_name}.hpp
+  content: |-
+    #pragma once
+
+    namespace {@ namespace @}
+    {
+    auto version() -> int;
+    }
+- path: src\main.cpp
+  content: |-
+    #include "{@ project_name @}/{@ project_name @}.hpp"
+
+    namespace {@ namespace @} {
+    auto version() -> int { return 0; }
+    }
