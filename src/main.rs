@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
-use pgen::cmd::gen::GenError::*;
-use std::{error::Error, fs::remove_dir_all, io::ErrorKind, path::PathBuf};
+use pgen::gen;
+use std::{error::Error, path::PathBuf};
 
 #[derive(Subcommand, Debug)]
 enum Commands {
@@ -42,65 +42,24 @@ struct Cli {
     command: Option<Commands>,
 }
 
-fn generate(
-    root: &PathBuf,
-    template: &PathBuf,
-    definitions: &PathBuf,
-) -> Result<(), Box<dyn Error>> {
-    if root.exists() {
-        return Err(Box::new(std::io::Error::from(
-            std::io::ErrorKind::AlreadyExists,
-        )));
-    }
-
-    match pgen::cmd::generate(root, template, definitions) {
-        Ok(_) => {}
-        Err(e) => {
-            match &e {
-                InvalidRenderedTemplateError => eprintln!("Rendered template is invalid."),
-                IoError(e) => eprintln!("IoError: {}", e),
-                SerializationError(e) => eprintln!("SerializationError: {}", e),
-                WriteError => {
-                    eprintln!("Error writing project. Removing root {:#?}", root);
-                    remove_dir_all(root).expect("Error removing root");
-                }
-            }
-
-            return Err(Box::new(e));
-        }
-    };
-
-    return Ok(());
-}
-
-fn from_directory(
-    directory: &PathBuf,
-    output: &PathBuf,
-    force: &bool,
-) -> Result<(), Box<dyn Error>> {
-    if output.exists() && !force {
-        return Err(Box::new(std::io::Error::from(ErrorKind::AlreadyExists)));
-    }
-
-    return match pgen::cmd::fd(&directory, &output) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(Box::new(e)),
-    };
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    match &cli.command {
+    let res = match &cli.command {
         Some(Commands::Gen {
             root,
             template,
             definitions,
-        }) => generate(root, template, definitions),
+        }) => gen(root, template, definitions),
         Some(Commands::Fd {
             directory,
             output,
             force,
-        }) => from_directory(directory, output, force),
+        }) => Ok(()),
         None => Ok(()),
+    };
+
+    match res {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Box::new(e)),
     }
 }

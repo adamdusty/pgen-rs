@@ -6,7 +6,7 @@ directories:
 - include\{@ project_name @}
 - src
 files:
-- path: include\{@ project_name @}\{project_name}.hpp
+- path: include\{@ project_name @}\{@project_name@}.hpp
   content: |-
     #pragma once
 
