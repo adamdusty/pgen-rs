@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use pgen::gen;
+use pgen::{fd, gen};
 use std::{error::Error, path::PathBuf};
 
 #[derive(Subcommand, Debug)]
@@ -44,22 +44,18 @@ struct Cli {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let res = match &cli.command {
+
+    match &cli.command {
         Some(Commands::Gen {
             root,
             template,
             definitions,
-        }) => gen(root, template, definitions),
+        }) => Ok(gen(root, template, definitions)?),
         Some(Commands::Fd {
             directory,
             output,
             force,
-        }) => Ok(()),
+        }) => Ok(fd(directory, output, *force)?),
         None => Ok(()),
-    };
-
-    match res {
-        Ok(_) => Ok(()),
-        Err(e) => Err(Box::new(e)),
     }
 }
